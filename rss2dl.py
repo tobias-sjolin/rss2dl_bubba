@@ -34,7 +34,7 @@ dir = '/home/' + user + '/torrents'
 __author__ = 'Baruch Even <baruch@ev-en.org> and Mkay'
 __version__ = '1.0.1 Bubba edition'
 
-import feedparser, re, urlparse, urllib
+import feedparser, re, urlparse, urllib2
 from os.path import basename, join, exists
 
 def dlfile(link):
@@ -42,10 +42,15 @@ def dlfile(link):
 	path = join(dir, basename(url))
 	if exists(path):
 		return
-		
-	u = urllib.urlopen(link)
-	torrent = u.read()
-	f = file(path, 'wb')
+
+        # add a header to define a custom User-Agent
+        req = urllib2.Request(link)
+        req.add_header('User-Agent','Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:26.0) Gecko/20100101 Firefox/26.0')
+        req.add_header('Cookie','__cfduid=dfb11515254ea45b882cc39409b4372af1390494025217')
+
+	torrent = urllib2.urlopen(req).read()
+
+        f = file(path, 'wb')
 	f.write(torrent)
 	f.close()
 
