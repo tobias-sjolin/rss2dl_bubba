@@ -11,14 +11,18 @@
 user = 'tobias'
 
 ## The shows you would like to download,
-progs = ['How I Met Your Mother -', 'The Big Bang Theory -','Community']
+#progs = ['How I Met Your Mother -', 'The Big Bang Theory -','Community']
 
 ## Any specific filetype you don't want to download
-blacklist = '720p .mkv'
+#blacklist = '720p .mkv'
+blacklist = ['720p .mkv','1080p .mkv','1080p','720p','(Indi)']
 
 ## The link to our own tvtorrents rss-feed
-##sources = ['http://www.tvtorrents.com/RssServlet?digest=XXXXX']
-sources = ['http://www.tvtorrents.com/RssServlet?digest=XXXXX']
+#sources = ['http://www.tvtorrents.com/RssServlet?digest=XXXXX']
+# Favourite torrents
+sources = ['http://www.tvtorrents.com/mytaggedRSS?digest=XXXXX']
+#Recent torrents
+#sources = ['http://www.tvtorrents.com/RssServlet?digest=XXXXX']
 
 #
 ## Do not edit beyond this line
@@ -48,19 +52,26 @@ def dlfile(link):
 title_re = re.compile(r'(.*?) ((?:\d+x\d+)|(?:\d+\.\d+\.\d+))(.*)')#(.*?) ?\((.*)\)')
 for src in sources:
 	rss = feedparser.parse(src)
+	#print rss
 	for entry in rss.entries:
+		#print title_re
 		m = title_re.match(entry['title'])
 		
 		if not m:
 			continue
 		
-		if m.group(1) in progs:
-			if blacklist not in m.group(3):
-				try:
-					dlfile(entry['link'])
-					print 'Downloading ' + entry['title']
-				except Exception,e:
-					print e
+		#if m.group(1) in progs:
+		stop = 0
+		for blist in blacklist:
+			if blist in m.group(3):
+				print entry['title'] + ' in blacklist'
+				stop = 1	
+		if stop == 0:
+			try:
+				dlfile(entry['link'])
+				print 'Downloading ' + entry['title']
+			except Exception,e:
+				print e
 					
 					
 					
