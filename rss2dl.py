@@ -7,7 +7,7 @@
 # the times the programs will normally show up on the rss feeds, or just once
 # every 6 hours.
 
-## The user you wish to download the torrent as
+## The Bubba user you wish to download the torrent as
 user = 'tobias'
 
 ## The shows you would like to download,
@@ -15,27 +15,32 @@ user = 'tobias'
 
 ## Any specific filetype you don't want to download
 #blacklist = '720p .mkv'
-blacklist = ['720p .mkv','1080p .mkv','1080p','720p','(Indi)']
+blacklist = ['WEB-DL','(Indi)','DD5']
 
 ## The link to our own tvtorrents rss-feed
 #sources = ['http://www.tvtorrents.com/RssServlet?digest=XXXXX']
 # Favourite torrents
-sources = ['http://www.tvtorrents.com/mytaggedRSS?digest=XXXXX']
+#sources = ['http://www.tvtorrents.com/mytaggedRSS?digest=XXXXX']  - TVTorrents discontinued...
 #Recent torrents
 #sources = ['http://www.tvtorrents.com/RssServlet?digest=XXXXX']
-
+sources = ['http://freshon.tv/rss.php?feed=dl&c[]=545&c[]=601&c[]=6221&c[]=386&c[]=577&c[]=313&c[]=552&passkey=XXXX']
 #
 ## Do not edit beyond this line
 #
 
 
 dir = '/home/' + user + '/torrents'
+#Change this to 1 to see all the logging
+verbose = 0
+#Number of hours to download torrents for
+timeLimitHours = 4
 
 __author__ = 'Baruch Even <baruch@ev-en.org> and Mkay'
 __version__ = '1.0.1 Bubba edition'
 
 import feedparser, re, urlparse, urllib2
 from os.path import basename, join, exists
+from datetime import datetime, timedelta
 
 def dlfile(link):
 	url = entry['title'] + ".torrent"
@@ -51,32 +56,52 @@ def dlfile(link):
 	torrent = urllib2.urlopen(req).read()
 
         f = file(path, 'wb')
+        #os.chmod(name, 0600)
 	f.write(torrent)
 	f.close()
 
-title_re = re.compile(r'(.*?) ((?:\d+x\d+)|(?:\d+\.\d+\.\d+))(.*)')#(.*?) ?\((.*)\)')
 for src in sources:
 	rss = feedparser.parse(src)
-	#print rss
+        if verbose:
+	    print 'PRINT rss '
+            print rss
+            print 'PRINT rss.entries'
+            print rss.entries
 	for entry in rss.entries:
-		#print title_re
-		m = title_re.match(entry['title'])
-		
-		if not m:
-			continue
-		
-		#if m.group(1) in progs:
-		stop = 0
-		for blist in blacklist:
-			if blist in m.group(3):
-				print entry['title'] + ' in blacklist'
-				stop = 1	
+            if verbose:
+                print 'PRINT title'
+                print entry['title']
+	    stop = 0
+            #Check if the title contains any of the blacklist words
+            for blist in blacklist:
+		if blist in entry['title']:
+		    print entry['title'] + ' in blacklist'
+		    stop = 1	
+                #Check the date to only download torrents for the last X provided hours.
+                date = entry['updated']
+                #Python version I am running does not support offest (%z) so need to cut that out
+                date = date[:-6]
+                #Convert string to datetime
+                date_object = datetime.strptime(date, '%a, %d %b %Y %H:%M:%S')
+                if verbose:
+                    print 'PRINT now '
+                    print datetime.now()
+                    print 'PRINT pubDate '
+                    print entry['updated']                
+                    print 'PRINT pubDate fixed '
+                    print date_object
+                if (datetime.now() - date_object) > timedelta(hours = timeLimitHours) and stop == 0:
+                    print entry['title'] + ' too old to download'
+                    print(datetime.now()-date_object)
+                    print date_object
+                    stop = 1
+                #If everything is okey then download the link provided
 		if stop == 0:
-			try:
-				dlfile(entry['link'])
-				print 'Downloading ' + entry['title']
-			except Exception,e:
-				print e
+		    try:
+		        dlfile(entry['link'])
+			print 'Downloading ' + entry['title']
+		    except Exception,e:
+	                print e
 					
 					
 					
