@@ -1,6 +1,0 @@
-[rss2dl]
-passkey = XXX
-user = tobias
-timeLimitHours = 4
-verbose = 0
-episodeOnly = 1
