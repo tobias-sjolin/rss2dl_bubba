@@ -7,9 +7,11 @@ Configuration should be placed in a file called<br>
 conf_rss2dl.cnf
 
 And the contents should be (this is my current):
-[rss2dl]
-passkey = XXX
-user = tobias
-timeLimitHours = 4
-verbose = 0
-episodeOnly = 1
+<code>
+<br>[rss2dl]
+<br>passkey = XXX
+<br>user = tobias
+<br>timeLimitHours = 4
+<br>verbose = 0
+<br>episodeOnly = 1
+</code>
