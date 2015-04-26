@@ -61,7 +61,7 @@ print 'timeLimitHours: ' + str(timeLimitHours)
 #Episode download only (no full Season torrents)
 episodeOnly = config.getint('rss2dl', 'episodeOnly')
 print 'EpisodeOnly: ' + str(episodeOnly)
-sources = ['http://freshon.tv/rss.php?feed=dl&c[]=545&c[]=601&c[]=6221&c[]=386&c[]=577&c[]=313&c[]=552&passkey=' + passkey]
+sources = ['http://freshon.tv/rss.php?feed=dl&c[]=545&c[]&passkey=' + passkey]
 for src in sources:
 	rss = feedparser.parse(src)
         if verbose:
